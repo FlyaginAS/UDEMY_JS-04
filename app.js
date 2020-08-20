@@ -11,15 +11,30 @@ GAME RULES:
 let scores;
 let roundScore;
 let activePlayer;
-let dice;
 
 scores = [0, 0];
 roundScore = 0;
 activePlayer = 1;
 
-dice = Math.floor(Math.random() * 6) + 1;
-
-document.querySelector(`#score-${activePlayer}`).textContent = dice;
-const x = document.querySelector(`#score-0`).textContent;
-
 document.querySelector('.dice').style.display = 'none';
+
+document.getElementById('score-0').textContent = '0';
+document.getElementById('score-1').textContent = '0';
+document.getElementById('current-0').textContent = '0';
+document.getElementById('current-1').textContent = '0';
+
+document.querySelector('.btn-roll').addEventListener('click', function () {
+  //1) Random number
+  const dice = Math.floor(Math.random() * 6) + 1;
+  //2) Display the result
+  const diceDOM = document.querySelector('.dice');
+  diceDOM.style.display = 'block';
+  diceDOM.src = `dice-${dice}.png`;
+
+  //3)Update the round score if the rolled number was not 1
+  if (dice === 1) {
+    console.log('it is 1');
+  }
+  scores[activePlayer] += dice;
+  console.log(scores[activePlayer]);
+});
