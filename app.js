@@ -12,6 +12,9 @@ let scores;
 let roundScore;
 let activePlayer;
 let gamePlaying;
+let lastDice;
+let gameOverScores;
+
 //functions
 function nextPlayer() {
   activePlayer === 0 ? (activePlayer = 1) : (activePlayer = 0);
@@ -24,11 +27,13 @@ function nextPlayer() {
 
   document.querySelector('.dice').style.display = 'none';
 }
-function init() {
+function init(val) {
   scores = [0, 0];
   roundScore = 0;
   activePlayer = 0;
   gamePlaying = true;
+  lastDice = 0;
+  gameOverScores = val === undefined ? 100 : val;
 
   document.querySelector('.dice').style.display = 'none';
 
@@ -39,14 +44,21 @@ function init() {
   document.querySelector('#name-0').textContent = 'Player 1';
   document.querySelector('#name-1').textContent = 'Player 2';
 }
-
+//initialize
 init();
 
 document.querySelector('.btn-roll').addEventListener('click', function () {
   //check state of game
   if (!gamePlaying) return;
+
   //1) Random number
   const dice = Math.floor(Math.random() * 6) + 1;
+  //check 6*2 status
+  if (lastDice === 6 && dice === 6) {
+    lastDice = 0;
+    return nextPlayer();
+  }
+  lastDice = dice;
   //2) Display the result
   const diceDOM = document.querySelector('.dice');
   diceDOM.style.display = 'block';
@@ -66,13 +78,15 @@ document.querySelector('.btn-roll').addEventListener('click', function () {
 document.querySelector('.btn-hold').addEventListener('click', function () {
   //check game status
   if (!gamePlaying) return;
+  //обнулдяем историю костяшки
+  lastDice = 0;
   //add current score to global score
   scores[activePlayer] += roundScore;
   //update the ui
   document.querySelector(`#score-${activePlayer}`).textContent =
     scores[activePlayer];
   //check if player won the game
-  if (scores[activePlayer] >= 10) {
+  if (scores[activePlayer] >= gameOverScores) {
     document.querySelector(`#name-${activePlayer}`).textContent = 'Winner';
     document.querySelector('.dice').style.display = 'none';
     document
@@ -87,4 +101,16 @@ document.querySelector('.btn-hold').addEventListener('click', function () {
     nextPlayer();
   }
 });
+
 document.querySelector('.btn-new').addEventListener('click', init);
+
+document
+  .querySelector('.set-score__btn')
+  .addEventListener('click', function () {
+    const input = document.querySelector('.set-score__input');
+    const btn = document.querySelector('.set-score__btn');
+    const userValue = +input.value;
+    if (userValue === '') return undefined;
+    gameOverScores = userValue;
+    init(gameOverScores);
+  });
